@@ -1,0 +1,125 @@
+name: Release Pipeline
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  OUTPUT_FOLDER: "./output"
+  FILENAME: "library"
+
+jobs:
+  pack-library:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository for deployment
+        uses: actions/checkout@v5
+
+      - name: Checkout shared-gfx repository
+        uses: actions/checkout@v5
+        with:
+          repository: 0x007E/shared-gfx
+          path: shared-gfx
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout hal-common repository
+        uses: actions/checkout@v5
+        with:
+          repository: 0x007E/hal-common
+          path: hal-common
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Checkout hal-avr0-spi repository
+        uses: actions/checkout@v5
+        with:
+          repository: 0x007E/hal-avr0-spi
+          path: hal-avr0-spi
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout utils-macros repository
+        uses: actions/checkout@v5
+        with:
+          repository: 0x007E/utils-macros
+          path: utils-macros
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare library package
+        run: |
+          mkdir -p ./${{ env.OUTPUT_FOLDER }}/shared/gfx
+          cp -r ./shared-gfx/color.h ./${{ env.OUTPUT_FOLDER }}/shared/gfx/
+
+          mkdir -p ./${{ env.OUTPUT_FOLDER }}/hal/common
+          mkdir -p ./${{ env.OUTPUT_FOLDER }}/hal/common/enums
+          mkdir -p ./${{ env.OUTPUT_FOLDER }}/hal/common/macros
+          cp -r ./hal-common/enums/SPI_enums.h ./${{ env.OUTPUT_FOLDER }}/hal/common/enums/
+          cp -r ./hal-common/macros/PORT_macros.h ./${{ env.OUTPUT_FOLDER }}/hal/common/macros/
+
+          mkdir -p ./${{ env.OUTPUT_FOLDER }}/hal/avr0/spi
+          cp -r ./hal-avr0-spi/spi.c ./${{ env.OUTPUT_FOLDER }}/hal/avr0/spi/
+          cp -r ./hal-avr0-spi/spi.h ./${{ env.OUTPUT_FOLDER }}/hal/avr0/spi/
+
+          mkdir -p ./${{ env.OUTPUT_FOLDER }}/utils/macros
+          cp -r ./utils-macros/stringify.h ./${{ env.OUTPUT_FOLDER }}/utils/macros/
+          
+          mkdir -p ./${{ env.OUTPUT_FOLDER }}/drivers/led/apa102
+          cp ./apa102.c ./${{ env.OUTPUT_FOLDER }}/drivers/led/apa102/
+          cp ./apa102.h ./${{ env.OUTPUT_FOLDER }}/drivers/led/apa102/
+
+      - name: Upload library package
+        uses: actions/upload-artifact@v4
+        with:
+            name: library-package
+            path: ${{ env.OUTPUT_FOLDER }}
+            retention-days: 1
+
+  create-release:
+    needs: [pack-library]
+    runs-on: ubuntu-latest
+    steps:
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+            Release ${{ github.ref }}
+        draft: false
+        prerelease: false
+
+    - name: Download Library Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: library-package
+        path: ./artifact/${{ env.FILENAME }}
+    - name: Display structure
+      run: ls -R ./artifact/${{ env.FILENAME }}
+    - name: Create Compressed File
+      run: |
+        cd ./artifact
+        tar -czvf ./${{ env.FILENAME }}.tar.gz ./${{ env.FILENAME }}
+        zip -r ./${{ env.FILENAME }}.zip ./${{ env.FILENAME }}
+        cd ..
+    
+    - name: Upload Build Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifact/${{ env.FILENAME }}.tar.gz
+        asset_name: ${{ env.FILENAME }}.tar.gz
+        asset_content_type: application/gzip
+    
+    - name: Upload Build Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./artifact/${{ env.FILENAME }}.zip
+        asset_name: ${{ env.FILENAME }}.zip
+        asset_content_type: application/zip
