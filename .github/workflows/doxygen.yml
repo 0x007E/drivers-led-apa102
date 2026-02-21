@@ -26,11 +26,11 @@ jobs:
       - name: Checkout repository for deployment
         uses: actions/checkout@v5
 
-      - name: Checkout shared-gfx repository
+      - name: Checkout core_types-gfx repository
         uses: actions/checkout@v5
         with:
-          repository: 0x007E/shared-gfx
-          path: shared-gfx
+          repository: 0x007E/core_types-gfx
+          path: core_types-gfx
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout hal-common repository
@@ -56,8 +56,8 @@ jobs:
 
       - name: Prepare files for Doxygen
         run: |
-          mkdir -p ./structure/shared/gfx
-          cp -r ./shared-gfx/color.h ./structure/shared/gfx/
+          mkdir -p ./structure/core_types/gfx
+          cp -r ./core_types-gfx/color.h ./structure/core_types/gfx/
 
           mkdir -p ./structure/hal/common
           mkdir -p ./structure/hal/common/enums

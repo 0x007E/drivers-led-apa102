@@ -18,11 +18,11 @@ jobs:
       - name: Checkout repository for deployment
         uses: actions/checkout@v5
 
-      - name: Checkout shared-gfx repository
+      - name: Checkout core_types-gfx repository
         uses: actions/checkout@v5
         with:
-          repository: 0x007E/shared-gfx
-          path: shared-gfx
+          repository: 0x007E/core_types-gfx
+          path: core_types-gfx
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout hal-common repository
@@ -48,8 +48,8 @@ jobs:
 
       - name: Prepare library package
         run: |
-          mkdir -p ./${{ env.OUTPUT_FOLDER }}/shared/gfx
-          cp -r ./shared-gfx/color.h ./${{ env.OUTPUT_FOLDER }}/shared/gfx/
+          mkdir -p ./${{ env.OUTPUT_FOLDER }}/core_types/gfx
+          cp -r ./core_types-gfx/color.h ./${{ env.OUTPUT_FOLDER }}/core_types/gfx/
 
           mkdir -p ./${{ env.OUTPUT_FOLDER }}/hal/common
           mkdir -p ./${{ env.OUTPUT_FOLDER }}/hal/common/enums
