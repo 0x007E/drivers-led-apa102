@@ -1,0 +1,112 @@
+name: Doxygen Deployment
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+env:
+  DOXYGEN_VERSION: 1.16.1
+  DOXYGEN_CONFIG: "doxygen.config"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository for deployment
+        uses: actions/checkout@v5
+
+      - name: Checkout shared-gfx repository
+        uses: actions/checkout@v5
+        with:
+          repository: 0x007E/shared-gfx
+          path: shared-gfx
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout hal-common repository
+        uses: actions/checkout@v5
+        with:
+          repository: 0x007E/hal-common
+          path: hal-common
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Checkout hal-avr0-spi repository
+        uses: actions/checkout@v5
+        with:
+          repository: 0x007E/hal-avr0-spi
+          path: hal-avr0-spi
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout utils-macros repository
+        uses: actions/checkout@v5
+        with:
+          repository: 0x007E/utils-macros
+          path: utils-macros
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prepare files for Doxygen
+        run: |
+          mkdir -p ./structure/shared/gfx
+          cp -r ./shared-gfx/color.h ./structure/shared/gfx/
+
+          mkdir -p ./structure/hal/common
+          mkdir -p ./structure/hal/common/enums
+          mkdir -p ./structure/hal/common/macros
+          cp -r ./hal-common/enums/SPI_enums.h ./structure/hal/common/enums/
+          cp -r ./hal-common/macros/PORT_macros.h ./structure/hal/common/macros/
+
+          mkdir -p ./structure/hal/avr0/spi
+          cp -r ./hal-avr0-spi/spi.c ./structure/hal/avr0/spi/
+          cp -r ./hal-avr0-spi/spi.h ./structure/hal/avr0/spi/
+
+          mkdir -p ./structure/utils/macros
+          cp -r ./utils-macros/stringify.h ./structure/utils/macros/
+
+          mkdir -p ./structure/drivers/led/apa102
+          cp -r ./apa102.c ./structure/drivers/led/apa102/
+          cp -r ./apa102.h ./structure/drivers/led/apa102/
+      
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Install Doxygen
+        run: |
+          mkdir -p ./install
+          wget https://www.doxygen.nl/files/doxygen-${{ env.DOXYGEN_VERSION }}.linux.bin.tar.gz
+          tar -xf doxygen-${{ env.DOXYGEN_VERSION }}.linux.bin.tar.gz -C ./install
+          sudo apt-get update && sudo apt-get install -y graphviz
+
+      - name: Build Doxygen docs
+        run: ./install/doxygen-${{ env.DOXYGEN_VERSION }}/bin/doxygen ./${{ env.DOXYGEN_CONFIG }}
+        
+      - name: Copy Doxygen output
+        run: |
+          mkdir -p ./_site
+          cp -r ./html/* ./_site/
+
+      - name: Upload artifact for deployment
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: ./_site
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
