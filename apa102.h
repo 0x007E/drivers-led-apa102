@@ -150,7 +150,7 @@
         #endif
     #endif
 
-    #include "../../../shared/gfx/color.h"
+    #include "../../../core_types/gfx/color.h"
     #include "../../../utils/macros/stringify.h"
 
     #include _STR(../../../hal/APA102_HAL_PLATFORM/spi/spi.h)
