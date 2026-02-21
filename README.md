@@ -6,7 +6,7 @@ This hardware abstracted driver can be used to interact with an [APA102](#additi
 
 ## File Structure
 
-![File Structure](https://0x007e.github.io/drivers-led-apa102/mcp7940_8c__incl.png)
+![File Structure](https://0x007e.github.io/drivers-led-apa102/apa102_8c__incl.png)
 
 ```
 drivers/
