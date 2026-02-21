@@ -26,7 +26,7 @@ hal/
         ├── spi.c
         └── spi.h
 
-shared/
+core_types/
 └── gfx/
     └── color.h
 
@@ -48,9 +48,9 @@ The library can be downloaded (`zip` or `tar`), cloned or used as submodule in a
 ### Using with `git clone`
 
 ```sh
-mkdir -p ./shared/
-git clone https://github.com/0x007E/shared-gfx.git ./shared
-mv ./shared/shared-gfx ./shared/gfxformat
+mkdir -p ./core_types/
+git clone https://github.com/0x007E/core_types-gfx.git ./core_types
+mv ./core_types/core_types-gfx ./core_types/gfx
 
 mkdir -p ./drivers/led/
 git clone https://github.com/0x007E/drivers-led-apa102.git ./drivers/led
@@ -75,7 +75,7 @@ mv ./utils/utils-macros  ./utils/macros
 ### Using as `git submodule`
 
 ```sh
-git submodule add https://github.com/0x007E/shared-gfx.git            shared/gfx
+git submodule add https://github.com/0x007E/core_types-gfx.git        core_types/gfx
 
 git submodule add https://github.com/0x007E/drivers-led-apa102.git    drivers/led/apa102
 git submodule add https://github.com/0x007E/hal-common.git            hal/common
