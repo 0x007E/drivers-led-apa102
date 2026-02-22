@@ -2,6 +2,8 @@
 
 # `APA102 RGB LED Driver`
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/0x007E/drivers-led-apa102)
+
 This hardware abstracted driver can be used to interact with an [APA102](#additional-information) or any compatible type over `TWI`/`I2C`. The hardware layer is fully abstract an can be switched between different plattforms. The `SPI` library has to impelement the [spi.h](https://0x007e.github.io/drivers-led-apa102/spi_8c.html)-header used in this repository.
 
 ## File Structure
