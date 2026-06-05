@@ -126,7 +126,10 @@
         #ifdef _DOXYGEN_    // Used for documentation, can be ignored
             #define APA102_POWER_SAVING_AVAILABLE
         #endif
+    #endif
 
+    #ifdef APA102_POWER_SAVING_AVAILABLE
+    
         #ifndef APA102_ENABLE_FLAG
             /**
              * @def APA102_ENABLE_FLAG
