@@ -9,38 +9,38 @@ on:
     - main
 
 env:
-  OUTPUT_FOLDER: "./output"
+  OUTPUT_FOLDER: "output"
   
 jobs:
   pack-library:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository for deployment
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Checkout core_types-gfx repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: 0x007E/core_types-gfx
           path: core_types-gfx
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout hal-common repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: 0x007E/hal-common
           path: hal-common
           token: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Checkout hal-avr0-spi repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: 0x007E/hal-avr0-spi
           path: hal-avr0-spi
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Checkout utils-macros repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           repository: 0x007E/utils-macros
           path: utils-macros
@@ -68,17 +68,12 @@ jobs:
           cp -r ./utils-macros/stringify.h ./${{ env.OUTPUT_FOLDER }}/utils/macros/
           
           mkdir -p ./${{ env.OUTPUT_FOLDER }}/drivers/led/apa102
-          cp ./apa102.c ./${{ env.OUTPUT_FOLDER }}/drivers/led/apa102/
-          cp ./apa102.h ./${{ env.OUTPUT_FOLDER }}/drivers/led/apa102/
- 
-      - name: Pack files for upload
-        run: |
-          tar -czvf build.tar.gz ${{ env.OUTPUT_FOLDER }}
-          zip -r build.zip ${{ env.OUTPUT_FOLDER }}
+          cp -r ./apa102.c ./${{ env.OUTPUT_FOLDER }}/drivers/led/apa102/
+          cp -r ./apa102.h ./${{ env.OUTPUT_FOLDER }}/drivers/led/apa102/
 
       - name: Upload library package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
             name: library-package
-            path: ${{ env.OUTPUT_FOLDER }}
+            path: ./${{ env.OUTPUT_FOLDER }}
             retention-days: 1
