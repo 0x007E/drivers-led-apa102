@@ -130,17 +130,6 @@
 
     #ifdef APA102_POWER_SAVING_AVAILABLE
     
-        #ifndef APA102_ENABLE_FLAG
-            /**
-             * @def APA102_ENABLE_FLAG
-             * @brief Flag used to enable LED operation.
-             *
-             * @details
-             * This flag value, default `0xE0`, is used in communication settings to signal enabling the LED device or functionality.
-             */
-            #define APA102_ENABLE_FLAG 0xE0
-        #endif
-        
         #ifndef APA102_SLEEP_FLAG
             /**
              * @def APA102_SLEEP_FLAG

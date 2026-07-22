@@ -32,7 +32,7 @@ static void apa102_frame(unsigned char flag, const GFX_RGBA_Color *color)
  * @brief Initialize the LED control interface and hardware.
  *
  * @details
- * This function initializes the SPI peripheral to communicate with the LEDs using most significant bit (`MSB`) first, with clock polarity and phase set to rising edges. After SPI initialization, it sends a start-of-frame (`SOF`) signal followed by initializing all configured LEDs with the enable flag and zero color data (LEDs initially off). Finally, it sends an end-of-frame (`EOF`) signal to mark completion of the initialization sequence. This setup prepares the LEDs for subsequent color and blink control operations by configuring the communication and initial states.
+ * This function sends a start-of-frame (`SOF`) signal followed by initializing all configured LEDs with the enable flag and zero color data (LEDs initially off). Finally, it sends an end-of-frame (`EOF`) signal to mark completion of the initialization sequence. This setup prepares the LEDs for subsequent color and blink control operations by configuring the communication and initial states.
  *
  * @note This function must be called before any other LED control operations. It assumes `SPI_MSB`, `SPI_Rising` macros and LED frame configurations are correctly defined.
  *
@@ -44,7 +44,7 @@ void apa102_init(void)
     APA102_SOF();
     for (unsigned char i=0; i < APA102_NUMBER_OF_LEDS; i++)
     {
-        apa102_frame(APA102_ENABLE_FLAG, &(GFX_RGBA_Color){APA102_MIN_INTENSITY, 0x00, 0x00, 0x00});
+        apa102_frame(APA102_START_FLAG, &(GFX_RGBA_Color){APA102_MIN_INTENSITY, 0x00, 0x00, 0x00});
     }
     APA102_EOF();
 }
@@ -86,7 +86,7 @@ void apa102_xof(APA102_Transmission type)
  */
 void apa102_led(const GFX_RGBA_Color *color)
 {
-    apa102_frame(APA102_ENABLE_FLAG | (0x3F & color->alpha), color);
+    apa102_frame(APA102_START_FLAG | (0x3F & color->alpha), color);
 }
 
 /**
@@ -111,7 +111,7 @@ void apa102_leds(const GFX_RGBA_Color *color)
 
     for (unsigned char i=0; i < APA102_NUMBER_OF_LEDS; i++)
     {
-        apa102_frame(APA102_ENABLE_FLAG | (0x3F & color->alpha), color);
+        apa102_frame(APA102_START_FLAG | (0x3F & color->alpha), color);
     }
 
     APA102_EOF();
